@@ -1,0 +1,39 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=true
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for robertdj/DeldirBuilder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: JHPDknP2jQYPUtO3NE/xFbmXaZ7MZYKEti2uWyfxiyKJZoesuofls7iDv+9r2CNh0KAs+dNsMi9JA4G1AtYRGAnVHBX/QYStPutHbeMy05CbK3nFIEG0Yh1K149LmF9uyrC+xhbX6kWh7khjbMUvG9WqaDqD2jXzg2imbTw7XNGnPRt3Gj/wXTTlTybERN2UC9mxLTHooM8TTqd0X8sPOVCupGU3EojX1GggMaDFEpKw1uPl7qQSxLFCyzFmw3IafL9ejr/L9vCtphHa1QabY5/tQanUFvXZQm2FrsTKZFqD/Ac/KCQd1xXG2VBY/JmBoXPpTiMCIyLy+Fc7xhKxl8nJyfFUkxNYEF0VxjpwfViOFkHx64Y942asE7fFsUQTYMwu6UYaHHZ/4y1aSTdKImRR123oqOfm0FDnOxWC0w1C8jBWDVZf33iGygtGIMNczCmpAbJsT7licMOf6SJDy/p12luq5oXFmxVFLaLaeVlq1JQ+ZTT12I1SJ1T46blJr55Rx3gRx+ItD2gg+OXmJDoFl5Oc+c7VXZW/3F4wWa82j4A0Bd71WQvasRLt14QgT9FH8K8pcXXgdxPR5PEQFdphjYWudpbijMfUc8VCrCS12db7/dXfwJwYXbzxSji1y2UDqff9SXuxUq1htePawNbioDsOIM+s/wL3CgSXqNs=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: robertdj/DeldirBuilder
+        tags: true
